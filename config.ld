@@ -1,6 +1,6 @@
-project='[repo-name]'
-title='[module-name] docs'
-description='[short-description]'
+project='homie-p1'
+title='homie-p1 docs'
+description='Homie device to read P1 smartmeter data (DSMR)'
 
 format='markdown'
 use_markdown_titles = true
