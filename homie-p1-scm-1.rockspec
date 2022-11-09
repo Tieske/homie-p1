@@ -25,6 +25,7 @@ description = {
 
 dependencies = {
   "lua >= 5.1, < 5.5",
+  "penlight ~> 1",
 }
 
 build = {
@@ -32,6 +33,13 @@ build = {
 
   modules = {
     ["homie-p1.init"] = "src/homie-p1/init.lua",
+    ["homie-p1.parser"] = "src/homie-p1/parser.lua",
+  },
+
+  install = {
+    bin = {
+      p1reader = "bin/p1reader.lua",
+    }
   },
 
   copy_directories = {
