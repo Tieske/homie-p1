@@ -143,29 +143,57 @@ local metrics do
         data[self.name] = convert_octet_string(elements[1])
       end,
     }, {
-      name = "power-in-total-t1",
+      name = "delivered-t1",
       -- description = "Meter Reading electricity received (Tariff 1) in 0,001 kWh",
       description = "Meter Reading electricity received (Tariff 1)",
       id = "1-0:1.8.1.255",
       parse = parse_number,
     }, {
-      name = "power-in-total-t2",
+      name = "delivered-t2",
       -- description = "Meter Reading electricity received (Tariff 2) in 0,001 kWh",
       description = "Meter Reading electricity received (Tariff 2)",
       id = "1-0:1.8.2.255",
       parse = parse_number,
     }, {
-      name = "power-out-total-t1",
+      name = "delivered",
+      -- description = "Meter Reading electricity received (T1+T2) in 0,001 kWh",
+      description = "Meter Reading electricity received (T1+T2)",
+      id = "ignore",
+      calc = function(self, data)
+        local t1 = data["delivered-t1"]
+        local t2 = data["delivered-t2"]
+        data[self.name] = {
+          description = self.description,
+          unit = t1.unit,
+          value = t1.value + t2.value
+        }
+      end,
+    }, {
+      name = "returned-t1",
       -- description = "Meter Reading electricity returned (Tariff 1) in 0,001 kWh",
       description = "Meter Reading electricity returned (Tariff 1)",
       id = "1-0:2.8.1.255",
       parse = parse_number,
     }, {
-      name = "power-out-total-t2",
+      name = "returned-t2",
       -- description = "Meter Reading electricity returned (Tariff 2) in 0,001 kWh",
       description = "Meter Reading electricity returned (Tariff 2)",
       id = "1-0:2.8.2.255",
       parse = parse_number,
+    }, {
+      name = "returned",
+      -- description = "Meter Reading electricity returned (T1+T2) in 0,001 kWh",
+      description = "Meter Reading electricity returned (T1+T2)",
+      id = "ignore",
+      calc = function(self, data)
+        local t1 = data["returned-t1"]
+        local t2 = data["returned-t2"]
+        data[self.name] = {
+          description = self.description,
+          unit = t1.unit,
+          value = t1.value + t2.value
+        }
+      end,
     }, {
       description = "Tariff indicator electricity",
       id = "0-0:96.14.0.255",
@@ -319,6 +347,20 @@ local metrics do
       description = "Instantaneous power returned L3",
       id = "1-0:62.7.0.255",
       parse = parse_number,
+    }, {
+      name = "power",
+      -- description = "Instantaneous power (received - returned) in W resolution",
+      description = "Instantaneous power (Pin - Pout)",
+      id = "ignore",
+      calc = function(self, data)
+        local p1 = data["power-in"]
+        local p2 = data["power-out"]
+        data[self.name] = {
+          description = self.description,
+          unit = p1.unit,
+          value = p1.value - p2.value
+        }
+      end,
     },
     -- Slave device identified by "channel" number 1-4
     {
@@ -334,6 +376,7 @@ local metrics do
           [998] = "water",       -- TODO: fix this ID to the proper one
           [999] = "thermal",     -- TODO: fix this ID to the proper one
         })[tonumber(elements[2])]
+        subdevice.description = subdevice.type .. " delivered to client"
       end,
     }, {
       name = "equipment-identifier",
@@ -353,7 +396,7 @@ local metrics do
         subdevice.timestamp = parse_timestamp(elements[2])
         local value, unit = parse_number_unit(elements[3])
         subdevice[self.name] = {
-          description = self.description,
+          --description = self.description,
           value = value,
           unit = unit,
         }
@@ -413,6 +456,13 @@ local function parse_datagram(str, crc)
       if not success then
         print("failed to match line: '"..line.."'")
       end
+    end
+  end
+
+  -- calculated fields
+  for _, metric in ipairs(metrics) do
+    if metric.calc then
+      metric:calc(data)
     end
   end
 
