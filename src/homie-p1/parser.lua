@@ -42,7 +42,7 @@ local function parse_number(self, data, elements)
   }
   local val, unit = parse_number_unit(elements[1])
   v.value = val
-  v.unit = unit
+  v.unit = unit or self.unit
   data[self.name or self.description] = v
 end
 
@@ -186,12 +186,14 @@ local metrics do
       -- description = "Number of power failures in any phase",
       description = "Power failures in any phase",
       id = "0-0:96.7.21.255",
+      unit = "#",
       parse = parse_number,
     }, {
       name = "failures-long-total",
       -- description = "Number of long power failures in any phase",
       description = "Long power failures in any phase",
       id = "0-0:96.7.9.255",
+      unit = "#",
       parse = parse_number,
     }, {
       name = "failure-log",
@@ -203,36 +205,42 @@ local metrics do
       -- description = "Number of voltage sags in phase L1",
       description = "Voltage sags in L1",
       id = "1-0:32.32.0.255",
+      unit = "#",
       parse = parse_number,
     }, {
       name = "voltage-sags-l2",
       -- description = "Number of voltage sags in phase L2",
       description = "Voltage sags in L2",
       id = "1-0:52.32.0.255",
+      unit = "#",
       parse = parse_number,
     }, {
       name = "voltage-sags-l3",
       -- description = "Number of voltage sags in phase L3",
       description = "Voltage sags in L3",
       id = "1-0:72.32.0.255",
+      unit = "#",
       parse = parse_number,
     }, {
       name = "voltage-swells-l1",
       -- description = "Number of voltage swells in phase L1",
       description = "Voltage swells in L1",
       id = "1-0:32.36.0.255",
+      unit = "#",
       parse = parse_number,
     }, {
       name = "voltage-swells-l2",
       -- description = "Number of voltage swells in phase L2",
       description = "Voltage swells in L2",
       id = "1-0:52.36.0.255",
+      unit = "#",
       parse = parse_number,
     }, {
       name = "voltage-swells-l3",
       -- description = "Number of voltage swells in phase L3",
       description = "Voltage swells in L3",
       id = "1-0:72.36.0.255",
+      unit = "#",
       parse = parse_number,
     }, {
       name = "text-message",
