@@ -26,14 +26,16 @@ description = {
 dependencies = {
   "lua >= 5.1, < 5.5",
   "penlight ~> 1",
+  "copas-async",
 }
 
 build = {
   type = "builtin",
 
   modules = {
-    ["homie-p1.init"] = "src/homie-p1/init.lua",
+    ["homie-p1.copas"] = "src/homie-p1/copas.lua",
     ["homie-p1.parser"] = "src/homie-p1/parser.lua",
+    ["homie-p1.log"] = "src/homie-p1/log.lua",
   },
 
   install = {

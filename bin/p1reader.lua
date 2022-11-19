@@ -2,17 +2,17 @@
 
 package.path = "./?/init.lua;"..package.path
 
-local Parser = require("homie-p1.parser")
-local parser = Parser.new()
+local copas = require("copas")
+local P1 = require("homie-p1.copas")
+
+local stream_open_command = "socat /dev/ttyUSB0,b115200 stdout"
 
 
-for line in io.lines() do
-  local res, err = parser:push_line(line)
-  if res then
-    print("Datagram: ", require("pl.pretty").write(res))
-  else
-    if err ~= "incomplete" then
-      print("an error:",err)
+copas(function()
+  local reader = P1.new {
+    stream_open_command = stream_open_command,
+    handler = function(datagram)
+      print("P1 datagram: ", require("pl.pretty").write(datagram))
     end
-  end
-end
+  }
+end)
