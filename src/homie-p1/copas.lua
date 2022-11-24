@@ -83,6 +83,7 @@ function M.new(opts)
     self.worker = nil
   end)
 
+  return self
 end
 
 return M
