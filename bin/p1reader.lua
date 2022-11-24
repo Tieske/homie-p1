@@ -35,6 +35,7 @@ local function check_received_fields(data)
   -- remove the not-included fields from the list
   for fieldname in pairs(data) do
     if fields_to_include[fieldname] == nil then
+print("field un known: ", fieldname)
       log:warn("received unknown field '%s' in the data, neither in- nor excluded on the device")
       data[fieldname] = nil
     end
