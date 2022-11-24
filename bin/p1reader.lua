@@ -4,9 +4,13 @@ package.path = "./?/init.lua;"..package.path
 
 local copas = require("copas")
 local P1 = require("homie-p1.copas")
+
+require "logging"
 local log = require("homie-p1.log")
+
+
 -- Endless loop restarting socat. Any error to be dismissed.
-local stream_open_command = "while : ; do socat $s stdout 2>/dev/null; done"
+local stream_open_command = "while : ; do socat %s stdout 2>/dev/null; done"
 local socat_input_stream = "/dev/ttyUSB0,b115200"
 
 local device_list = {} -- Homie devices indexed by the smartmeter ID
