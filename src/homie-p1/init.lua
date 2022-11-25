@@ -136,7 +136,7 @@ function Homie_P1:update_device(datagram)
     copas.addthread(function()
       -- handle meters individually
       for meter_id, meter_data in pairs(datagram) do
-        self:update_single_meter(meter_id, meter_data)
+        self:update_single_meter(meter_data)
       end
     end)
   end
