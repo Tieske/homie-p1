@@ -151,10 +151,14 @@ function Homie_P1:update_device(datagram)
   if not self.homie_device then
     self:create_device(datagram)
   else
-    -- handle meters individually
-    for meter_id, meter_data in pairs(datagram) do
-      self:update_single_meter(meter_id, meter_data)
-    end
+    -- update in a new thread, so any failures will be logged, but won't
+    -- stop future updates
+    copas.addthread(function()
+      -- handle meters individually
+      for meter_id, meter_data in pairs(datagram) do
+        self:update_single_meter(meter_id, meter_data)
+      end
+    end)
   end
 end
 
