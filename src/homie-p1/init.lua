@@ -112,7 +112,8 @@ function Homie_P1:create_device(datagram)
       mbus = true,
       timestamp = true,
       type = true,
-      ["failure-log"] = true
+      ["failure-log"] = true,
+      ["text-message"] = true,
     }
 
     -- populate node properties
