@@ -75,7 +75,7 @@ end
 -- First datagram for the device, create a new device for it, and start.
 function Homie_P1:create_device(datagram)
 
-  self.homie_device = {
+  local dev = {
     uri = self.homie_mqtt_uri,
     domain = self.homie_domain,
     broker_state = nil, -- do not recover state from broker
@@ -91,7 +91,7 @@ function Homie_P1:create_device(datagram)
 
     -- create and add the node
     local node = {}
-    self.homie_device.nodes[meter_data.type] = node
+    dev.nodes[meter_data.type] = node
 
     -- populate the node
     node.name = ("%s meter, serial %s"):format(meter_data.type, meter_id)
@@ -133,6 +133,7 @@ function Homie_P1:create_device(datagram)
 
   end -- nodes
 
+  self.homie_device = Device.new(dev)
   self.homie_device:start()
 end
 
