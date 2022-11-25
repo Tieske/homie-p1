@@ -12,13 +12,8 @@ local CR = string.char(tonumber("0D",16))
 local CRLF = CR..LF
 
 local stringx = require "pl.stringx"
+local log = require("logging").defaultLogger()
 
-
--- override print to go to stderr instead
--- local function print(...)
---   io.stderr:write(...)
---   io.stderr:write("\n")
--- end
 
 
 -- Parses a string with numeric value and optional unit separated by '*'
@@ -447,14 +442,14 @@ local function parse_datagram(str, crc)
           if metric.parse then
             metric:parse(data, matches)
           else
-            print("no parser for '"..line.."'")
+            log:debug("no parser for '%s'", line)
           end
           success = true
           break
         end
       end
       if not success then
-        print("failed to match line: '"..line.."'")
+        log:debug("failed to match line: '%s'", line)
       end
     end
   end

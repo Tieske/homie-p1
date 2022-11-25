@@ -65,14 +65,14 @@ local function check_received_fields(data)
   -- remove the not-included fields from the list
   for fieldname in pairs(data) do
     if fields_to_include[fieldname] == nil then
-      log:warn("received unknown field '%s' in the data, neither in- nor excluded on the device")
+      log:warn("received unknown field '%s' in the data, neither in- nor excluded on the device", fieldname)
       data[fieldname] = nil
     end
   end
 end
 
 
--- First datagram for the device, create a new device for it
+-- First datagram for the device, create a new device for it, and start.
 function Homie_P1:create_device(datagram)
 
   self.homie_device = {
@@ -86,17 +86,47 @@ function Homie_P1:create_device(datagram)
     nodes = {}
   }
 
+  -- handle meters individually
+  for meter_id, meter_data in pairs(datagram) do
 
+    -- create and add the node
+    local node = {}
+    self.homie_device.nodes[meter_data.type] = node
 
-  check_received_fields(datagram)
-  error("not implemented")
+    -- populate the node
+    node.name = ("%s meter, serial %s"):format(meter_data.type, meter_id)
+    node.type = ("%s smartmeter (%s), serial %s"):format(
+      meter_data.type,
+      (meter_data.mbus and ("slave, mbus: "..meter_data.mbus) or "master"),
+      meter_id
+    )
+
+    -- populate node properties
+    local props = {}
+    node.properties = props
+
+    check_received_fields(meter_data) -- remove unwanted elements
+
+    for name, data in pairs(meter_data) do
+      props.name = data.description
+      props.settable = false
+      props.retained = true
+      props.datatype = "float"
+      props.unit = data.unit
+      props.format = nil
+      props.default = data.value
+    end -- properties
+
+  end -- nodes
+
+  self.homie_device:start()
 end
 
 
 -- update the data for a single meter within a device
 function Homie_P1:update_single_meter(meter_data)
   check_received_fields(meter_data)
-  error("not implemented")
+  --error("not implemented")
 end
 
 
