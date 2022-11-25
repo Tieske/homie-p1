@@ -45,31 +45,17 @@ Homie_P1.__index = Homie_P1
 local stream_open_command = "while : ; do socat %s stdout 2>/dev/null; done"
 
 
--- explicitly list fields to in/exclude
-local fields_to_exclude = {
-  "mbus",
-  "failure-log",
+-- properties in the datagram dataset to skip
+local skip_props = {
+  description = true,
+  ["device-type"] = true,
+  ["equipment-identifier"] = true,
+  mbus = true,
+  timestamp = true,
+  type = true,
+  ["failure-log"] = true,
+  ["text-message"] = true,
 }
-local fields_to_include = {
-
-}
-
--- remove non-used fields from the data (in place).
--- will log a warning for unknown fields
-local function check_received_fields(data)
-  -- remove all fields that have been excluded
-  for _, name in ipairs(fields_to_exclude) do
-    data[name] = nil
-  end
-
-  -- remove the not-included fields from the list
-  for fieldname in pairs(data) do
-    if fields_to_include[fieldname] == nil then
-      log:warn("received unknown field '%s' in the data, neither in- nor excluded on the device", fieldname)
-      data[fieldname] = nil
-    end
-  end
-end
 
 
 -- First datagram for the device, create a new device for it, and start.
@@ -94,7 +80,7 @@ function Homie_P1:create_device(datagram)
     dev.nodes[meter_data.type] = node
 
     -- populate the node
-    node.name = ("%s meter, serial %s"):format(meter_data.type, meter_id)
+    node.name = meter_data.type
     node.type = ("%s smartmeter (%s), serial %s"):format(
       meter_data.type,
       (meter_data.mbus and ("slave, mbus: "..meter_data.mbus) or "master"),
@@ -102,19 +88,6 @@ function Homie_P1:create_device(datagram)
     )
     local props = {}
     node.properties = props
-
-    -- check_received_fields(meter_data) -- remove unwanted elements
-
-    local skip_props = {
-      description = true,
-      ["device-type"] = true,
-      ["equipment-identifier"] = true,
-      mbus = true,
-      timestamp = true,
-      type = true,
-      ["failure-log"] = true,
-      ["text-message"] = true,
-    }
 
     -- populate node properties
     for name, data in pairs(meter_data) do
@@ -141,8 +114,15 @@ end
 
 -- update the data for a single meter within a device
 function Homie_P1:update_single_meter(meter_data)
-  check_received_fields(meter_data)
-  --error("not implemented")
+
+  local node = self.homie_device.nodes[meter_data.type]
+
+  for name, data in pairs(meter_data) do
+    if not skip_props[name] then
+      local prop = node.properties[name]
+      prop:set(data.value)
+    end
+  end
 end
 
 
