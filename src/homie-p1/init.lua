@@ -100,21 +100,35 @@ function Homie_P1:create_device(datagram)
       (meter_data.mbus and ("slave, mbus: "..meter_data.mbus) or "master"),
       meter_id
     )
-
-    -- populate node properties
     local props = {}
     node.properties = props
 
-    check_received_fields(meter_data) -- remove unwanted elements
+    -- check_received_fields(meter_data) -- remove unwanted elements
 
+    local skip_props = {
+      description = true,
+      ["device-type"] = true,
+      ["equipment-identifier"] = true,
+      mbus = true,
+      timestamp = true,
+      type = true,
+      ["failure-log"] = true
+    }
+
+    -- populate node properties
     for name, data in pairs(meter_data) do
-      props.name = data.description
-      props.settable = false
-      props.retained = true
-      props.datatype = "float"
-      props.unit = data.unit
-      props.format = nil
-      props.default = data.value
+      if not skip_props[name] then
+        local prop = {}
+        props[name] = prop
+
+        prop.name = data.description
+        prop.settable = false
+        prop.retained = true
+        prop.datatype = "float"
+        prop.unit = data.unit
+        prop.format = nil
+        prop.default = data.value
+      end
     end -- properties
 
   end -- nodes
