@@ -43,9 +43,7 @@ Homie_P1.__index = Homie_P1
 
 -- Endless loop restarting socat. Any error to be dismissed.
 local stream_open_command = "while : ; do socat %s stdout 2>/dev/null; done"
-local socat_input_stream_default = "/dev/ttyUSB0,b115200"
 
-local homie_device -- the Homie device, once created
 
 -- explicitly list fields to in/exclude
 local fields_to_exclude = {
@@ -67,7 +65,6 @@ local function check_received_fields(data)
   -- remove the not-included fields from the list
   for fieldname in pairs(data) do
     if fields_to_include[fieldname] == nil then
-print("field un known: ", fieldname)
       log:warn("received unknown field '%s' in the data, neither in- nor excluded on the device")
       data[fieldname] = nil
     end
@@ -76,9 +73,9 @@ end
 
 
 -- First datagram for the device, create a new device for it
-local function create_device(datagram)
+function Homie_P1:create_device(datagram)
 
-  homie_device = {
+  self.homie_device = {
     uri = self.homie_mqtt_uri,
     domain = self.homie_domain,
     broker_state = nil, -- do not recover state from broker
@@ -89,28 +86,28 @@ local function create_device(datagram)
     nodes = {}
   }
 
-  for
 
-  check_received_fields(data)
+
+  check_received_fields(datagram)
   error("not implemented")
 end
 
 
 -- update the data for a single meter within a device
-local function update_single_meter(meter_data)
-  check_received_fields(data)
+function Homie_P1:update_single_meter(meter_data)
+  check_received_fields(meter_data)
   error("not implemented")
 end
 
 
 -- Handle a single device upate listed in a datagram
-local function update_device(self, datagram)
+function Homie_P1:update_device(datagram)
   if not self.homie_device then
-    create_device(meter_data)
+    self:create_device(datagram)
   else
     -- handle meters individually
     for meter_id, meter_data in pairs(datagram) do
-      update_single_meter(self, meter_id, meter_data)
+      self:update_single_meter(meter_id, meter_data)
     end
   end
 end
@@ -124,9 +121,9 @@ return function(opts)
   assert(os.execute("socat -h > /dev/null"), "failed to detect 'socat'")
 
   self.parser = require("homie-p1.copas").new {
-    stream_open_command = stream_open_command:format(socat_input_stream),
+    stream_open_command = stream_open_command:format(opts.socat_input_stream),
     handler = function(datagram)
-      return update_device(self, datagram)
+      return self:update_device(datagram)
     end,
   }
 end

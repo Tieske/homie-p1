@@ -42,14 +42,14 @@ logger:info("starting P1-to-Homie bridge")
 
 
 local opts = {
-  stream_open_command = os.getenv("P1_SOCAT_INPUT") or "/dev/ttyUSB0,b115200",
+  socat_input_stream = os.getenv("P1_SOCAT_INPUT") or "/dev/ttyUSB0,b115200",
   homie_domain = os.getenv("HOMIE_DOMAIN") or "homie",
   homie_mqtt_uri = assert(os.getenv("HOMIE_MQTT_URI"), "environment variable HOMIE_MQTT_URI not set"),
   homie_device_id = os.getenv("HOMIE_DEVICE_ID") or "smartmeter",
   homie_device_name = os.getenv("HOMIE_DEVICE_NAME") or "P1-smartmeter reader (DSMR)",
 }
 
-logger:info("P1_SOCAT_INPUT: %s", opts.stream_open_command)
+logger:info("P1_SOCAT_INPUT: %s", opts.socat_input_stream)
 logger:info("HOMIE_DOMAIN: %s", opts.homie_domain)
 logger:info("HOMIE_MQTT_URI: %s", opts.homie_mqtt_uri)
 logger:info("HOMIE_DEVICE_ID: %s", opts.homie_device_id)
