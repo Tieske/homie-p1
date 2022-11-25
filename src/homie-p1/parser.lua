@@ -140,19 +140,19 @@ local metrics do
     }, {
       name = "delivered-t1",
       -- description = "Meter Reading electricity received (Tariff 1) in 0,001 kWh",
-      description = "Meter Reading electricity received (Tariff 1)",
+      description = "Meter reading electricity received (Tariff 1)",
       id = "1-0:1.8.1.255",
       parse = parse_number,
     }, {
       name = "delivered-t2",
       -- description = "Meter Reading electricity received (Tariff 2) in 0,001 kWh",
-      description = "Meter Reading electricity received (Tariff 2)",
+      description = "Meter reading electricity received (Tariff 2)",
       id = "1-0:1.8.2.255",
       parse = parse_number,
     }, {
       name = "delivered",
       -- description = "Meter Reading electricity received (T1+T2) in 0,001 kWh",
-      description = "Meter Reading electricity received (T1+T2)",
+      description = "Meter reading electricity received (T1+T2)",
       id = "ignore",
       calc = function(self, data)
         local t1 = data["delivered-t1"]
@@ -166,19 +166,19 @@ local metrics do
     }, {
       name = "returned-t1",
       -- description = "Meter Reading electricity returned (Tariff 1) in 0,001 kWh",
-      description = "Meter Reading electricity returned (Tariff 1)",
+      description = "Meter reading electricity returned (Tariff 1)",
       id = "1-0:2.8.1.255",
       parse = parse_number,
     }, {
       name = "returned-t2",
       -- description = "Meter Reading electricity returned (Tariff 2) in 0,001 kWh",
-      description = "Meter Reading electricity returned (Tariff 2)",
+      description = "Meter reading electricity returned (Tariff 2)",
       id = "1-0:2.8.2.255",
       parse = parse_number,
     }, {
       name = "returned",
       -- description = "Meter Reading electricity returned (T1+T2) in 0,001 kWh",
-      description = "Meter Reading electricity returned (T1+T2)",
+      description = "Meter reading electricity returned (T1+T2)",
       id = "ignore",
       calc = function(self, data)
         local t1 = data["returned-t1"]
@@ -391,7 +391,7 @@ local metrics do
         subdevice.timestamp = parse_timestamp(elements[2])
         local value, unit = parse_number_unit(elements[3])
         subdevice[self.name] = {
-          --description = self.description,
+          description = self.description,
           value = value,
           unit = unit,
         }
