@@ -63,6 +63,7 @@ function M.new(opts)
             -- we have a line
             local datagram, err = parser:push_line(line)
             if datagram then -- datagram is complete, deliver it
+              log:debug("P1 datagram received")
               self.queue:push(datagram)
 
             else
