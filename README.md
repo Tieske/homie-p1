@@ -1,4 +1,4 @@
-[![Unix build](https://img.shields.io/github/workflow/status/Tieske/homie-p1/Unix%20build?label=Unix%20build&logo=linux)](https://github.com/Tieske/homie-p1/actions/workflows/unix_build.yml)
+[![Unix build](https://img.shields.io/github/actions/workflow/status/Tieske/homie-p1/unix_build.yml?branch=main&label=Unix%20build&logo=linux)](https://github.com/Tieske/homie-p1/actions/workflows/unix_build.yml)
 [![Coveralls code coverage](https://img.shields.io/coveralls/github/Tieske/homie-p1?logo=coveralls)](https://coveralls.io/github/Tieske/homie-p1)
 [![Lint](https://github.com/Tieske/homie-p1/workflows/Lint/badge.svg)](https://github.com/Tieske/homie-p1/actions/workflows/lint.yml)
 [![SemVer](https://img.shields.io/github/v/tag/Tieske/homie-p1?color=brightgreen&label=SemVer&logo=semver&sort=semver)](CHANGELOG.md)

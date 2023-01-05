@@ -1,10 +1,4 @@
---- This module does something.
---
--- Explain some basics, or the design.
---
--- @copyright Copyright (c) 2022-2022 Thijs Schreijer
--- @author Thijs Schreijer
--- @license MIT, see `LICENSE.md`.
+--- P1 smartmeter datagram parser (DSMR).
 
 local M = {}
 local LF = string.char(tonumber("0A",16))
@@ -474,10 +468,19 @@ local function parse_datagram(str, crc)
   return datagram
 end
 
-
+--- Creates a new parser object.
+-- @tparam[opt={}] table opts table with options (none supported for now)
+-- @treturn P1Parser the parser object
 function M.new(opts)
   local self = opts or {}
 
+  --- Line-by-line parser function.
+  -- Lines must be fed in line by line. Lines will be buffered until the datagram
+  -- is complete.
+  -- @function P1Parser:push_line
+  -- @tparam string line read from the P1 port
+  -- @treturn table parsed datagram or nil+error. If the error is `"incomplete"` then
+  -- more lines are needed to complete the datagram.
   function self:push_line(str)
     assert(type(str) == "string", "expected a string")
     if not self.buffer then
@@ -493,17 +496,19 @@ function M.new(opts)
       crc = str:sub(2, -1)
       str = "!"
     end
-    self.buffer = self.buffer .. CRLF .. str
 
+    -- add to buffer and check completeness
+    self.buffer = self.buffer .. CRLF .. str
     if not crc then
       return nil, "incomplete"
     end
 
+    -- datagram complete, go parse and return
     str = self.buffer
     self.buffer = nil
-
     return parse_datagram(str, crc)
   end
+
   return self
 end
 

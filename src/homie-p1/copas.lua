@@ -1,15 +1,23 @@
---- This module does something.
+--- Copas based async P1 reader.
 --
--- Explain some basics, or the design.
+-- This module uses an OS command to read from (using `io.popen`). So a `socat`
+-- command can be used to read from a serial port and to pass it to `stdout` which
+-- will be captured by `io.popen`.
 --
+-- Because `io.popen` based IO is blocking, the `copas.async` module is used to
+-- create an OS thread (using LuaLanes) to do this task. So the core Copas loop
+-- remains fully async.
+--
+-- TL;DR; provide an OS command to read the P1 data from, and this module will
+-- fully async turn them into parsed datagrams to handle.
 -- @copyright Copyright (c) 2022-2022 Thijs Schreijer
 -- @author Thijs Schreijer
 -- @license MIT, see `LICENSE.md`.
 
 local M = {}
 M._VERSION = "0.0.1"
-M._COPYRIGHT = "Copyright (c) 2022-2022 Thijs Schreijer"
-M._DESCRIPTION = "Homie device to read P1 smartmeter data (DSMR)"
+M._COPYRIGHT = "Copyright (c) 2022-2023 Thijs Schreijer"
+M._DESCRIPTION = "Copas based P1 smartmeter data (DSMR) reader"
 
 
 local copas = require("copas")
@@ -25,6 +33,18 @@ local Queue = require("copas.queue")
 M.log = require "homie-p1.log"
 
 
+--- Constructs and returns a new reader instance.
+-- Upon constructing the reader, it will immediately open the stream and start parsing
+-- in background task.
+-- @tparam table opts A table with configuration options.
+-- @tparam[opt] logger opts.log A LuaLogging compatible logger object to use for
+-- logging in this instance. If omitted, the logger configured on the module table
+-- (field `log`) will be used.
+-- @tparam string opts.stream_open_command The command to use with `io.popen` to open
+-- the stream to read P1 data from. Typically this is a `socat` type command.
+-- @tparam function opts.handler A datagram handler function. The function will get
+-- a single parsed datagram each time it is called.
+-- @function P1.new
 function M.new(opts)
 
   local self = {
@@ -35,7 +55,8 @@ function M.new(opts)
   }
   self.queue:add_worker(assert(opts.handler, "expected opts.handler to be a function"))
 
-  -- instructs reader to exit
+  --- Instructs reader to exit.
+  -- @function P1:stop
   function self.stop()
     self.exiting = true
   end
@@ -43,20 +64,22 @@ function M.new(opts)
   -- Stream reader and parser
   self.worker = copas.addnamedthread("P1-reader/parser", function()
     local log = self.log
+
     while not self.exiting do
       local parser = Parser.new()
       -- start an async OS thread to read the stream
       local stream, err = async.io_popen(self.stream_open_command, "r")
       if not stream then
         log:error("failed opening stream: %s", err)
-        copas.sleep(2)
+        copas.pause(2)
+
       else
         -- go in loop reading data
         while not self.exiting do
           local line, err = stream:read()
           if not line then
             log:error("failed reading from stream: %s", tostring(err))
-            copas.sleep(2)
+            copas.pause(2)
             break -- exit inner loop to recreate stream and parser
 
           else

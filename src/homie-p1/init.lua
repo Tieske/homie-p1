@@ -1,39 +1,37 @@
---- Hue-to-Homie bridge.
+--- P1 smartmeter to Homie bridge.
 --
--- This module instantiates a homie device acting as a bridge between the Philips
--- Hue API and Homie.
+-- This module instantiates a homie device posting data read from a P1 smartmeter
+-- port as a Homie device.
+--
+-- The input will be read from a serial port using `socat` to pass the data to
+-- `stdout`. The actual socat command is:
+--
+--      `while : ; do socat [INPUT_STREAM] stdout 2>/dev/null; done`
+--
+-- this will dismiss any error output and ensures a restart if something fails.
 --
 -- The module returns a single function that takes an options table. When called
 -- it will construct a Homie device and add it to the Copas scheduler (without
 -- running the scheduler).
--- @copyright Copyright (c) 2022-2022 Thijs Schreijer
+-- @copyright Copyright (c) 2022-2023 Thijs Schreijer
 -- @author Thijs Schreijer
 -- @license MIT, see `LICENSE`.
 -- @usage
 -- local copas = require "copas"
--- local hmh = require "homie-hue"
+-- local hp1 = require "homie-p1"
 --
--- hmh {
---   millheat_access_key = "xxxxxxxx",
---   millheat_secret_token = "xxxxxxxx",
---   millheat_username = "xxxxxxxx",
---   millheat_password = "xxxxxxxx",
---   millheat_poll_interval = 15,            -- default: 15 seconds
---   homie_mqtt_uri = "http://mqtthost:123", -- format: "mqtt(s)://user:pass@hostname:port"
---   homie_domain = "homie",                 -- default: "homie"
---   homie_device_id = "millheat",           -- default: "millheat"
---   homie_device_name = "M2H bridge",       -- default: "Millheat-to-Homie bridge"
+-- hp1 {
+--   socat_input_stream = "/dev/ttyUSB0,b115200", -- input stream, see socat docs
+--   homie_mqtt_uri = "http://mqtthost:123",      -- format: "mqtt(s)://user:pass@hostname:port"
+--   homie_domain = "homie",                      -- default: "homie"
+--   homie_device_id = "smartmeter",              -- default: "smartmeter"
+--   homie_device_name = "Homie smartmeter",      -- default: "P1 Smartmeter"
 -- }
 --
--- copas.loop()
+-- copas()
 
 local copas = require "copas"
-local copas_timer = require "copas.timer"
 local Device = require "homie.device"
-local slugify = require("homie.utils").slugify
-local log = require("logging").defaultLogger()
-local json = require "cjson.safe"
-local now = require("socket").gettime
 
 
 local Homie_P1 = {}
@@ -63,12 +61,12 @@ function Homie_P1:create_device(datagram)
 
   local dev = {
     uri = self.homie_mqtt_uri,
-    domain = self.homie_domain,
+    domain = self.homie_domain or "homie",
     broker_state = nil, -- do not recover state from broker
-    id = self.homie_device_id,
+    id = self.homie_device_id or "smartmeter",
     homie = "4.0.0",
     extensions = "",
-    name = self.homie_device_name,
+    name = self.homie_device_name or "P1 Smartmeter",
     nodes = {}
   }
 

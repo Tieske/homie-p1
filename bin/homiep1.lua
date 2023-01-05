@@ -4,9 +4,9 @@
 -- Reads configuration from environment variables and starts the P1-to-Homie bridge.
 -- Does not support any CLI parameters.
 --
--- For configureing the log, use LuaLogging environment variable prefix `"HOMIE_LOG_"`, see
+-- For configuring the log, use LuaLogging environment variable prefix `"HOMIE_LOG_"`, see
 -- "logLevel" in the example below.
--- @module homiehue
+-- @script homiep1
 -- @usage
 -- # configure parameters as environment variables
 -- export P1_SOCAT_INPUT="/dev/ttyUSB0,b115200"   # default: "/dev/ttyUSB0,b115200"

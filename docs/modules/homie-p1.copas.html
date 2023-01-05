@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>homie-p1 docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>homie-p1</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Fields">Fields</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/homie-p1.html">homie-p1</a></li>
+  <li><strong>homie-p1.copas</strong></li>
+  <li><a href="../modules/homie-p1.log.html">homie-p1.log</a></li>
+  <li><a href="../modules/homie-p1.parser.html">homie-p1.parser</a></li>
+</ul>
+<h2>Scripts</h2>
+<ul class="nowrap">
+  <li><a href="../scripts/homiep1.html">homiep1</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>homie-p1.copas</code></h1>
+<p>Copas based async P1 reader.</p>
+<p> This module uses an OS command to read from (using <a href="https://www.lua.org/manual/5.1/manual.html#pdf-io.popen">io.popen</a>). So a <code>socat</code>
+ command can be used to read from a serial port and to pass it to <code>stdout</code> which
+ will be captured by <a href="https://www.lua.org/manual/5.1/manual.html#pdf-io.popen">io.popen</a>.</p>
+
+<p> Because <a href="https://www.lua.org/manual/5.1/manual.html#pdf-io.popen">io.popen</a> based IO is blocking, the <code>copas.async</code> module is used to
+ create an OS thread (using LuaLanes) to do this task. So the core Copas loop
+ remains fully async.</p>
+
+<p> TL;DR; provide an OS command to read the P1 data from, and this module will
+ fully async turn them into parsed datagrams to handle.</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: Copyright (c) 2022-2022 Thijs Schreijer</li>
+        <li><strong>License</strong>: MIT, see <a href="../topics/LICENSE.md.html#">LICENSE.md</a>.</li>
+        <li><strong>Author</strong>: Thijs Schreijer</li>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#P1.new">P1.new (opts)</a></td>
+	<td class="summary">Constructs and returns a new reader instance.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#P1:stop">P1:stop ()</a></td>
+	<td class="summary">Instructs reader to exit.</td>
+	</tr>
+</table>
+<h2><a href="#Fields">Fields</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#log">log</a></td>
+	<td class="summary">Logger is set on the module table, to be able to override it.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "P1.new"></a>
+    <strong>P1.new (opts)</strong>
+    </dt>
+    <dd>
+    Constructs and returns a new reader instance.
+ Upon constructing the reader, it will immediately open the stream and start parsing
+ in background task.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">opts</span> A table with configuration options.
+        <ul>
+        <li><span class="parameter">log</span>
+            <span class="types"><span class="type">logger</span></span>
+         A LuaLogging compatible logger object to use for
+ logging in this instance. If omitted, the logger configured on the module table
+ (field <a href="../modules/homie-p1.log.html">log</a>) will be used.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">stream_open_command</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The command to use with <a href="https://www.lua.org/manual/5.1/manual.html#pdf-io.popen">io.popen</a> to open
+ the stream to read P1 data from. Typically this is a <code>socat</code> type command.
+        </li>
+        <li><span class="parameter">handler</span>
+            <span class="types"><span class="type">function</span></span>
+         A datagram handler function. The function will get
+ a single parsed datagram each time it is called.
+        </li>
+        </li></ul>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "P1:stop"></a>
+    <strong>P1:stop ()</strong>
+    </dt>
+    <dd>
+    Instructs reader to exit.
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "log"></a>
+    <strong>log</strong>
+    </dt>
+    <dd>
+    Logger is set on the module table, to be able to override it.
+ Default is the LuaLogging default logger (if loaded), or a no-op function.
+ Per client overrides can be given in <a href="../modules/homie-p1.copas.html#P1.new">P1.new</a>.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2023-01-05 15:41:28 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

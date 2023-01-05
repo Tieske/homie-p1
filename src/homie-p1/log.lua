@@ -1,7 +1,6 @@
--- logging
-
--- returns a LuaLogging compatible logger object if LuaLogging was already loaded
--- otherwise returns a stub
+--- Logging compatibility module.
+-- Returns a LuaLogging compatible logger object if LuaLogging was already loaded
+-- otherwise returns a stub.
 
 local ll = package.loaded.logging
 if ll and type(ll) == "table" and ll.defaultLogger and
