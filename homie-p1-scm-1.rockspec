@@ -26,6 +26,7 @@ description = {
 dependencies = {
   "lua >= 5.1, < 5.5",
   "penlight ~> 1",
+  "lualogging >= 1.6.0, < 2",
   "copas-async",
 }
 
