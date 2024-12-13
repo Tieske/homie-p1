@@ -11,6 +11,7 @@ elsewhere with little effort.
 Assuming a Raspberry Pi;
 
 ```shell
+# Install Lua and the LuaRocks package manager
 sudo apt update
 sudo apt install -y socat git liblua5.1-0-dev
 wget https://luarocks.org/releases/luarocks-3.9.1.tar.gz
@@ -21,27 +22,12 @@ cd ..
 rm -rf luarocks-3.9.1
 rm luarocks-3.9.1.tar.gz
 
-sudo luarocks install copas
-sudo luarocks install penlight
-# luamqtt fork to be used for now
-sudo luarocks install Tieske/luamqtt --dev
-# homie development branch for now
-sudo luarocks install homie --dev
-sudo luarocks install luabitop
-
+# Install Homie-P1
 git clone https://github.com/Tieske/homie-p1
 cd homie-p1
 sudo luarocks make
 cd ..
 rm -rf homie-p1
-
-# while waiting for PR https://github.com/hishamhm/copas-async/pull/1
-git clone https://github.com/Tieske/copas-async
-cd homie-p1
-git checkout updates
-sudo luarocks make
-cd ..
-rm -rf copas-async
 ```
 
 ## 1.2 Daemonizing
